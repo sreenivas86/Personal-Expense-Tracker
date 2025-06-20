@@ -1,0 +1,56 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# --------------------
+# Eclipse
+# --------------------
+.project
+.classpath
+.settings/
+bin/
+
+# --------------------
+# Spring Boot config
+# --------------------
+# Avoid committing secrets like DB passwords, API keys
+.env
+.env.*
+application.properties
+application.yml
+application-*.yml
+application-*.properties
+
+# If using a different profile for dev
+src/main/resources/application-dev.properties
+src/main/resources/application-dev.yml
