@@ -81,7 +81,7 @@ public class AppConfig {
 	@Bean
 	CorsFilter  corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://40.81.231.150:5173")); // frontend origin
+        config.setAllowedOrigins(List.of("http://40.81.231.150:5173","http://40.81.231.150:5002")); // frontend origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 
