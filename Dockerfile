@@ -1,14 +1,21 @@
-# Use Eclipse Temurin JDK 21 on Alpine Linux
-FROM eclipse-temurin:21-jdk-alpine
+# -------- Stage 1: Build --------
+FROM maven:3.9-eclipse-temurin-21 AS builder
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy the Spring Boot JAR file into the container
-COPY target/*.jar app.jar
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Expose the port your app listens on
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+
+# -------- Stage 2: Run --------
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
-
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
