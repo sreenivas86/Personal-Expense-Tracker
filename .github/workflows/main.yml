@@ -1,22 +1,25 @@
-name: sonar-test
-on: 
+name: Build
+
+on:
   push:
     branches:
       - main
+
+
 jobs:
   build:
-    name: sonar build
+    name: Build and analyze
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: get code
-        uses: actions/checkout@v6.0.2
-
-      - name: install java
-        uses: actions/setup-java@v5.2.0
+      - uses: actions/checkout@v4
         with:
-          java-version: '21'
-          distribution: 'temurin' 
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu' # Alternative distribution options are available.
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
