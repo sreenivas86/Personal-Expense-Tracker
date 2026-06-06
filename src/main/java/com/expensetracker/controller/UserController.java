@@ -80,6 +80,6 @@ public class UserController {
 	}
 	@GetMapping("/welcome")
 	public String authWelcome() {
-		return "sreenivas is developer";
+		return "sreenivas is developer file wat ";
 	}
 }

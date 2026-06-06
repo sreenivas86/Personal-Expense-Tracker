@@ -1,7 +1,9 @@
 package com.expensetracker.cofig;
 
 import java.util.List;
+import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,8 @@ import com.expensetracker.service.impl.UserServiceImpl;
 public class AppConfig {
 	
 	private UserServiceImpl userServiceImpl;
+	 @Value("${frontend.cors.list}")
+    private String origins;
 	
 	@Autowired
 	private JwtFilter jwtFilter;
@@ -81,7 +85,8 @@ public class AppConfig {
 	@Bean
 	CorsFilter  corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // frontend origin
+		List<String> allowedOrigins = Arrays.asList(origins.split(","));
+        config.setAllowedOrigins(allowedOrigins); // frontend origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 

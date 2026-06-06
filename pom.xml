@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.seven</groupId>
 	<artifactId>Expense-Tracker</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>sp001</version>
 	<name>Expense-Tracker</name>
 	<description>Demo project for Spring Boot</description>
 	<url />
@@ -132,4 +132,11 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+    <repository>
+        <id>nexus</id>
+        <name>Nexus Releases</name>
+        <url>http://20.193.138.44:8081/repository/maven-releases/</url>
+    </repository>
+</distributionManagement>
 </project>

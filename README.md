@@ -95,3 +95,130 @@ spring.h2.console.path=/h2-console
 [h2 access url](http://localhost:8080/h2-console)
 
 ````
+
+
+
+
+Perfect! Here’s a **complete Spring Boot + Docker setup** where all configuration comes from **Docker environment variables**, ready to run with MySQL.
+
+---
+
+# 1️⃣ Project Structure
+
+```
+springboot-docker-app/
+├─ src/
+│  └─ main/
+│      └─ java/com/example/demo/
+│          └─ DemoApplication.java
+├─ pom.xml
+├─ Dockerfile
+└─ .env
+```
+
+---
+
+# 2️⃣ `application.properties`
+
+```properties
+server.port=${SERVER_PORT:8080}                 # fallback to 8080
+spring.datasource.url=${DB_URL}                # from Docker env
+spring.datasource.username=${DB_USERNAME}      # from Docker env
+spring.datasource.password=${DB_PASSWORD}      # from Docker env
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+```
+
+* `${VAR_NAME:default}` → environment variable substitution
+* Works with **Docker environment variables**
+
+---
+
+# 3️⃣ Sample Spring Boot main class
+
+```java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+```
+
+---
+
+# 4️⃣ Dockerfile
+
+```dockerfile
+# Use OpenJDK 21 Alpine
+FROM openjdk:21-jdk-alpine
+
+WORKDIR /app
+
+# Copy built jar
+COPY target/demo-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose port (from properties/env)
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+> Make sure you run `mvn clean package` to create the `target/demo-0.0.1-SNAPSHOT.jar`.
+
+---
+
+# 5️⃣ `.env` file (for Docker environment variables)
+
+```env
+SERVER_PORT=9090
+DB_URL=jdbc:mysql://mysql:3306/mydb
+DB_USERNAME=root
+DB_PASSWORD=secret
+```
+
+---
+
+# 6️⃣ Run with Docker
+
+```bash
+# Build the image
+docker build -t springboot-docker-app .
+
+# Run container using .env file
+docker run --env-file .env -p 9090:9090 springboot-docker-app
+```
+
+* `--env-file .env` → injects all environment variables into the container
+* Spring Boot reads them automatically
+
+---
+
+# 7️⃣ Optional: Using individual `-e` flags
+
+```bash
+docker run -d -p 9090:9090 \
+  -e SERVER_PORT=9090 \
+  -e DB_URL=jdbc:mysql://mysql:3306/mydb \
+  -e DB_USERNAME=root \
+  -e DB_PASSWORD=secret \
+  springboot-docker-app
+```
+
+---
+
+# 8️⃣ Notes
+
+* This setup **does not require changes** to your application code when moving between dev, staging, or production.
+* You can also link a **MySQL container** using Docker Compose for full environment setup.
+
+---
+
+
+

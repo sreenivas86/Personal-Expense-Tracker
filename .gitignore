@@ -44,6 +44,7 @@ bin/
 # Spring Boot config
 # --------------------
 # Avoid committing secrets like DB passwords, API keys
+
 # .env
 # .env.*
 # application.properties
@@ -54,3 +55,4 @@ bin/
 # If using a different profile for dev
 # src/main/resources/application-dev.properties
 # src/main/resources/application-dev.yml
+
