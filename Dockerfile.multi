@@ -17,5 +17,7 @@ ENV APP_PORT=8080
 WORKDIR  /app
 # copy jar file from stage
 COPY --from=stage /app/target/*.jar app.jar
+# expose port
+EXPOSE 8080
 # run the app 
 ENTRYPOINT [ "java","-jar","app.jar" ]
