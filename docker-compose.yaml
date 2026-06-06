@@ -1,0 +1,26 @@
+
+services:
+
+  # MySQL Database Service
+  mysql:
+    image: mysql:8-oracle
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: expense_tracker
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - 3306:3306
+  
+  # application service
+  expense_tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile.multi
+    container_name: expense_tracker
+    depends_on:
+      - mysql
+    environment:
+      APP_NAME: Expense-Tracker
+      DB_URL: jdbc:mysql://mysql:3306/expense_tracker
+      DB_USERNAME: root
+      DB_PASSWORD: root123

@@ -50,7 +50,7 @@ public class JwtServiceImpl implements JwtService {
 					.parseSignedClaims(token)
 					.getPayload();
 		} catch (Exception e) {
-			throw new RuntimeException("invalic Jwt token", e);
+			throw new RuntimeException("invalid Jwt token", e);
 		}
 	}
 
