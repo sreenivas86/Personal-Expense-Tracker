@@ -14,7 +14,8 @@ ENV FRONTEND_CORS_LIST=http://localhost:5173,http://localhost:3000
 WORKDIR /app
 # copy jar file from local build
 COPY target/*.jar app.jar
-# expose port
-EXPOSE 8080
-# run app
-ENTRYPOINT [ "java","-jar","app.jar" ]
+#expose port
+EXPOSE ${APP_PORT}
+
+# Pass APP_PORT to Spring Boot
+ENTRYPOINT ["java", "-jar", "-Dserver.port=${APP_PORT}", "app.jar"]
