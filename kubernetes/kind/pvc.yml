@@ -5,10 +5,8 @@ metadata:
   namespace: e-track
 spec:
   accessModes:
-  - ReadWriteOnce
-
+    - ReadWriteOnce
   storageClassName: local-storage
-
   resources:
     requests:
       storage: 1Gi

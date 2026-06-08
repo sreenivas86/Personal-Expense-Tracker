@@ -8,6 +8,6 @@ spec:
     app: e-track-app
   type: NodePort
   ports:
-    port: 8080
-    targetPort: 8080
-    
+    - port: 8080          # ✅ fixed missing list syntax
+      targetPort: 8080
+      nodePort: 30080     # ✅ optional fixed port

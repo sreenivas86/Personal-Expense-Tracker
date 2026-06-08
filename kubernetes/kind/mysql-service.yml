@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: mysql
-  clusterIP: None
+  clusterIP: None   # headless service - correct for StatefulSet
   ports:
-  - port: 3306
-    targetPort: 3306
+    - port: 3306
+      targetPort: 3306

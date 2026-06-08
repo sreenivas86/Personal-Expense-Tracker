@@ -6,8 +6,8 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   storageClassName: local-storage
-
+  persistentVolumeReclaimPolicy: Retain   # ✅ added
   hostPath:
     path: /data/mysql
