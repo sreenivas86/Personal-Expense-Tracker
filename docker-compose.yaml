@@ -10,6 +10,8 @@ services:
       MYSQL_ROOT_PASSWORD: root123
     ports:
       - 3306:3306
+    networks:
+      - backend
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot123"]
       interval: 10s
@@ -31,3 +33,9 @@ services:
       DB_URL: jdbc:mysql://mysql:3306/expense_tracker
       DB_USERNAME: root
       DB_PASSWORD: root123
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
