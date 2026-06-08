@@ -1,15 +1,19 @@
 # buid the jar
 FROM maven:3.9-eclipse-temurin-21 as stage
 WORKDIR /app
-COPY . .
+COPY pom.xml pom.xml
+COPY src/ src/
 RUN mvn clean package -DskipTests
 
 # build container from stage
 FROM eclipse-temurin:21-jre-alpine
 
 # env variables
+# Default values / documented environment variables
 ENV APP_NAME=Expense-Tracker
-ENV DB_URL=jdbc:mysql://localhost:3306/expense_tracker
+ENV DB_HOST=localhost
+ENV DB_PORT=3306
+ENV DB_NAME=expense_tracker
 ENV DB_USERNAME=chandu
 ENV DB_PASSWORD=1234
 ENV APP_PORT=8080

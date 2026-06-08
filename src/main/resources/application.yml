@@ -3,7 +3,7 @@ spring:
     name:  ${APP_NAME:Expense-Tracker567}
 
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/expense_tracker}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:expense_tracker}
     username: ${DB_USERNAME:chandu}
     password: ${DB_PASSWORD:1234}
 

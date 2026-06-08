@@ -21,6 +21,8 @@ services:
       - mysql
     environment:
       APP_NAME: Expense-Tracker
-      DB_URL: jdbc:mysql://mysql:3306/expense_tracker
+      DB_HOST: localhost
+      DB_PORT: 3306
+      DB_NAME: expense_tracker
       DB_USERNAME: root
       DB_PASSWORD: root123
