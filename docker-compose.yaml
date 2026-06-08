@@ -35,6 +35,7 @@ services:
       DB_NAME: expense_tracker
       DB_USERNAME: root
       DB_PASSWORD: root123
+      FRONTEND_CORS_LIST: http://localhost:5173,http://localhost:3000
     networks:
       - backend
 

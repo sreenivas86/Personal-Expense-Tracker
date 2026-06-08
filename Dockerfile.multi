@@ -21,7 +21,7 @@ ENV DB_NAME=expense_tracker
 ENV DB_USERNAME=root
 ENV DB_PASSWORD=root123
 ENV APP_PORT=8080
-
+ENV FRONTEND_CORS_LIST=http://localhost:5173,http://localhost:3000
 WORKDIR /app
 
 # Copy jar from builder stage
