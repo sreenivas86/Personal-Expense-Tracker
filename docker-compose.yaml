@@ -24,6 +24,8 @@ services:
     container_name: expense_tracker
     depends_on:
       - mysql
+    ports:
+      -p 8080:8080
     environment:
       APP_NAME: Expense-Tracker
       DB_URL: jdbc:mysql://mysql:3306/expense_tracker
