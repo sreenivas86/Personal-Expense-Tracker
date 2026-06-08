@@ -10,6 +10,13 @@ services:
       MYSQL_ROOT_PASSWORD: root123
     ports:
       - 3306:3306
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
   
   # application service
   expense_tracker:
@@ -19,6 +26,8 @@ services:
     container_name: expense_tracker
     depends_on:
       - mysql
+    ports:
+      - 8080:8080
     environment:
       APP_NAME: Expense-Tracker
       DB_HOST: localhost
@@ -26,3 +35,9 @@ services:
       DB_NAME: expense_tracker
       DB_USERNAME: root
       DB_PASSWORD: root123
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
