@@ -1,4 +1,3 @@
-
 services:
 
   # MySQL Database Service
@@ -17,15 +16,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-  
-  # application service
+
+  # Application Service
   expense_tracker:
     build:
       context: .
       dockerfile: Dockerfile.multi
     container_name: expense_tracker
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy   # ✅ Waits until MySQL passes healthcheck
     ports:
       - 8080:8080
     environment:
