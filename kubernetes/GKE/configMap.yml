@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-vars
+  namespace: e-track-dev
+data:
+  database-name: expense_tracker
+  app-name: Expense-Tracker
+  db-host: mysql
+  db-port: "3306"       # ✅ quoted
+  db-username: root
+  app-port: "8080"      # ✅ quoted
