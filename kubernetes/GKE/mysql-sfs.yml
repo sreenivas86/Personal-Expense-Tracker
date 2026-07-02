@@ -8,34 +8,43 @@ spec:
     matchLabels:
       app: mysql-sfs
   serviceName: "mysql-sfs"
-  replicas: 2
+
+  # Use 1 replica when using a single existing PVC
+  replicas: 1
+
   template:
     metadata:
       labels:
         app: mysql-sfs
     spec:
       terminationGracePeriodSeconds: 10
+
       containers:
         - name: mysql-sfs
           image: mysql:8-oracle
           imagePullPolicy: IfNotPresent
+
           ports:
             - containerPort: 3306
               name: mysql
+
           volumeMounts:
-            - name: mysql-data
+            - name: mysql-storage
               mountPath: /var/lib/mysql
+
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
                   key: sql-password
+
             - name: MYSQL_DATABASE
               valueFrom:
                 configMapKeyRef:
                   name: app-vars
                   key: database-name
+
           resources:
             requests:
               cpu: "150m"
@@ -43,6 +52,7 @@ spec:
             limits:
               cpu: "500m"
               memory: "512Mi"
+
           startupProbe:
             exec:
               command:
@@ -51,6 +61,7 @@ spec:
                 - mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD"
             failureThreshold: 30
             periodSeconds: 10
+
           readinessProbe:
             exec:
               command:
@@ -59,6 +70,7 @@ spec:
                 - mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD"
             initialDelaySeconds: 10
             periodSeconds: 10
+
           livenessProbe:
             exec:
               command:
@@ -68,14 +80,7 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 20
 
-  # ✅ CORRECT - volumeClaimTemplates for StatefulSet
-  volumeClaimTemplates:
-    - metadata:
-        name: mysql-data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: mysql-premium-sc   # your StorageClass
-        resources:
-          requests:
-            storage: 10Gi
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc

@@ -4,6 +4,7 @@ metadata:
   name: app-vars
   namespace: e-track-dev
 data:
+  
   database-name: expense_tracker
   app-name: Expense-Tracker
   db-host: mysql-sfs-0.mysql-sfs.e-track-dev.svc.cluster.local

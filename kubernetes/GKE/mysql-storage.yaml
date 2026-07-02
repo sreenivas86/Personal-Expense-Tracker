@@ -7,6 +7,5 @@ reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 parameters:
-  type: hyperdisk-balanced
-  provisioned-iops-on-create: "10000"
-  provisioned-throughput-on-create: "300"
+  type: pd-balanced
+  
