@@ -7,7 +7,7 @@ data:
   
   database-name: expense_tracker
   app-name: Expense-Tracker
-  db-host: mysql-sfs-0.mysql-sfs.e-track-dev.svc.cluster.local
+  db-host: mysql-sfs
   db-port: "3306"       # ✅ quoted
   db-username: root
   app-port: "8080"      # ✅ quoted

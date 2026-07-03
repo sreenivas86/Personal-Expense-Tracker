@@ -1,14 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-svc
+  name: mysql-sfs
   namespace: e-track-dev
 spec:
-  selector:
-    app: mysql-svc
   clusterIP: None
+  selector:
+    app: mysql-sfs
   ports:
-  - name: mysql-svc
-    port: 3306 
-    targetPort: 3306
-    
+    - port: 3306
+      targetPort: 3306
+      name: mysql

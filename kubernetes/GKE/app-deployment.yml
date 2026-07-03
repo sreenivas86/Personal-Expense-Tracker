@@ -21,7 +21,7 @@ spec:
             - sh
             - -c
             - |
-              until nc -z mysql-sfs-0.mysql-sfs.e-track-dev.svc.cluster.local 3306;
+              until nc -z mysql-sfs 3306;
               do
                 echo "Waiting for MySQL...";
                 sleep 5;
