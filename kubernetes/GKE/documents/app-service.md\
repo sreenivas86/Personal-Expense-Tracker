@@ -1,0 +1,510 @@
+# Kubernetes LoadBalancer Service Explained
+
+## Service Manifest
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: e-track-app-svc
+  namespace: e-track-dev
+
+spec:
+  selector:
+    app: e-track-app
+
+  type: LoadBalancer
+
+  sessionAffinity: None
+
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+
+  ports:
+    - name: e-track-app-svc
+      port: 8080
+      targetPort: 8080
+```
+
+---
+
+# What is a Service?
+
+A **Service** is a Kubernetes resource that provides a stable network endpoint for accessing one or more Pods.
+
+Pods are temporary and their IP addresses change whenever they are recreated. A Service provides a consistent IP address and DNS name so applications and users can always reach the Pods.
+
+In your project, this Service exposes the Spring Boot application running inside the Deployment.
+
+---
+
+# Why Use a LoadBalancer Service?
+
+Your Spring Boot application must be accessible from outside the Kubernetes cluster.
+
+By specifying:
+
+```yaml
+type: LoadBalancer
+```
+
+Kubernetes asks the cloud provider (Google Kubernetes Engine) to create an external load balancer with a public IP address.
+
+You successfully accessed your application using:
+
+```
+http://<External-IP>:8080
+```
+
+---
+
+# Line-by-Line Explanation
+
+## 1. apiVersion
+
+```yaml
+apiVersion: v1
+```
+
+Specifies the Kubernetes Core API version.
+
+---
+
+## 2. kind
+
+```yaml
+kind: Service
+```
+
+Creates a Kubernetes Service.
+
+---
+
+## 3. metadata
+
+```yaml
+metadata:
+  name: e-track-app-svc
+  namespace: e-track-dev
+```
+
+### name
+
+Assigns the Service name.
+
+Inside the cluster, other applications can reach your application using:
+
+```
+e-track-app-svc
+```
+
+---
+
+### namespace
+
+Creates the Service inside the **e-track-dev** namespace.
+
+---
+
+# spec Section
+
+Defines how the Service routes traffic.
+
+---
+
+## 4. selector
+
+```yaml
+selector:
+  app: e-track-app
+```
+
+The selector tells Kubernetes which Pods belong to this Service.
+
+Your Deployment creates Pods with:
+
+```yaml
+labels:
+  app: e-track-app
+```
+
+Since both labels match, Kubernetes automatically creates Service endpoints.
+
+Flow:
+
+```
+Service
+      │
+      ▼
+Pods
+app=e-track-app
+```
+
+If the selector doesn't match the Pod labels, the Service will have **no endpoints**.
+
+Example:
+
+```bash
+kubectl get endpoints e-track-app-svc
+```
+
+Output:
+
+```
+NAME              ENDPOINTS
+e-track-app-svc   <none>
+```
+
+You encountered this issue earlier because your Service selector did not match your Deployment labels. After correcting the selector, Kubernetes populated the endpoints and traffic started reaching the Pods.
+
+---
+
+## 5. type
+
+```yaml
+type: LoadBalancer
+```
+
+This tells Kubernetes to create an external Load Balancer.
+
+In GKE, Kubernetes automatically provisions a **Google Cloud Load Balancer** and assigns a public IP address.
+
+Traffic flow:
+
+```
+Internet
+     │
+     ▼
+Google Cloud Load Balancer
+     │
+     ▼
+Kubernetes Service
+     │
+     ▼
+Application Pods
+```
+
+When you ran:
+
+```bash
+kubectl get svc -n e-track-dev
+```
+
+You saw:
+
+```
+NAME               TYPE           EXTERNAL-IP
+e-track-app-svc    LoadBalancer   34.xxx.xxx.xxx
+```
+
+That external IP is the public endpoint users access.
+
+---
+
+# Session Affinity
+
+```yaml
+sessionAffinity: None
+```
+
+Controls whether client requests are always sent to the same Pod.
+
+### None
+
+Requests are distributed across all available Pods.
+
+Example:
+
+```
+Client
+   │
+   ▼
+LoadBalancer
+   │
+ ┌─┴───────────────┐
+ ▼                 ▼
+Pod-1           Pod-2
+```
+
+This provides better load balancing.
+
+---
+
+## sessionAffinityConfig
+
+```yaml
+sessionAffinityConfig:
+  clientIP:
+    timeoutSeconds: 10800
+```
+
+This configuration is only used when:
+
+```yaml
+sessionAffinity: ClientIP
+```
+
+Since your configuration uses:
+
+```yaml
+sessionAffinity: None
+```
+
+this section is **ignored** by Kubernetes.
+
+If you want sticky sessions, you would configure:
+
+```yaml
+sessionAffinity: ClientIP
+```
+
+Then a client would continue communicating with the same Pod for **10,800 seconds (3 hours)**.
+
+---
+
+# Ports
+
+```yaml
+ports:
+```
+
+Defines how traffic reaches the application.
+
+---
+
+## name
+
+```yaml
+name: e-track-app-svc
+```
+
+A friendly name for the Service port.
+
+Useful when exposing multiple ports.
+
+---
+
+## port
+
+```yaml
+port: 8080
+```
+
+The port exposed by the Service.
+
+Users connect to:
+
+```
+http://<External-IP>:8080
+```
+
+---
+
+## targetPort
+
+```yaml
+targetPort: 8080
+```
+
+The port on which the Spring Boot container is listening.
+
+You verified this using:
+
+```bash
+kubectl exec -it <pod> -- netstat -tln
+```
+
+Output:
+
+```
+0.0.0.0:8080 LISTEN
+```
+
+Traffic flow:
+
+```
+User
+   │
+http://34.xxx.xxx.xxx:8080
+   │
+   ▼
+LoadBalancer Service
+   │
+   ▼
+Pod:8080
+```
+
+---
+
+# How It Works in Your Project
+
+```
+Internet
+     │
+     ▼
+Google Cloud Load Balancer
+     │
+     ▼
+Service
+e-track-app-svc
+     │
+     ▼
+Deployment
+     │
+ ┌───┴─────────────┐
+ ▼                 ▼
+Pod-1          Pod-2
+Spring Boot    Spring Boot
+```
+
+The Service automatically distributes requests across both application Pods.
+
+---
+
+# Load Balancing
+
+Suppose two replicas are running:
+
+```
+Replica 1
+Spring Boot
+
+Replica 2
+Spring Boot
+```
+
+Requests arrive as:
+
+```
+Request 1 → Pod 1
+
+Request 2 → Pod 2
+
+Request 3 → Pod 1
+
+Request 4 → Pod 2
+```
+
+If Pod 1 crashes:
+
+```
+Request
+   │
+   ▼
+LoadBalancer
+   │
+   ▼
+Pod 2
+```
+
+Users continue accessing the application without interruption.
+
+---
+
+# Useful Commands
+
+## View Services
+
+```bash
+kubectl get svc -n e-track-dev
+```
+
+---
+
+## Describe the Service
+
+```bash
+kubectl describe svc e-track-app-svc -n e-track-dev
+```
+
+---
+
+## View Endpoints
+
+```bash
+kubectl get endpoints e-track-app-svc -n e-track-dev
+```
+
+Example:
+
+```
+NAME              ENDPOINTS
+e-track-app-svc   10.110.0.15:8080,10.110.0.16:8080
+```
+
+---
+
+## Check External IP
+
+```bash
+kubectl get svc e-track-app-svc -n e-track-dev
+```
+
+Output:
+
+```
+NAME               TYPE           EXTERNAL-IP
+e-track-app-svc    LoadBalancer   34.xxx.xxx.xxx
+```
+
+---
+
+## Test the Application
+
+```bash
+curl http://<External-IP>:8080
+```
+
+Or open the application in your browser:
+
+```
+http://<External-IP>:8080
+```
+
+---
+
+# Architecture Diagram
+
+```
+                 Internet
+                     │
+                     ▼
+      +-------------------------------+
+      | Google Cloud Load Balancer    |
+      +---------------+---------------+
+                      │
+                      ▼
+      +-------------------------------+
+      | Kubernetes Service            |
+      | e-track-app-svc               |
+      | Type: LoadBalancer            |
+      +---------------+---------------+
+                      │
+          +-----------+-----------+
+          │                       │
+          ▼                       ▼
+ +----------------+      +----------------+
+ | Spring Boot    |      | Spring Boot    |
+ | Pod-1          |      | Pod-2          |
+ | Port 8080      |      | Port 8080      |
+ +----------------+      +----------------+
+```
+
+---
+
+# Summary
+
+| Field | Purpose |
+|--------|---------|
+| `apiVersion: v1` | Uses the Kubernetes Core API |
+| `kind: Service` | Creates a Service resource |
+| `metadata.name` | Service name (`e-track-app-svc`) |
+| `namespace` | Creates the Service in the `e-track-dev` namespace |
+| `selector` | Routes traffic to Pods labeled `app: e-track-app` |
+| `type: LoadBalancer` | Creates a Google Cloud external Load Balancer with a public IP |
+| `sessionAffinity: None` | Distributes requests across all Pods |
+| `sessionAffinityConfig` | Ignored because session affinity is disabled |
+| `port: 8080` | Port exposed by the Service |
+| `targetPort: 8080` | Port on which the Spring Boot container listens |
+| **Purpose** | Exposes the Spring Boot application to the internet through a Google Cloud Load Balancer, distributing incoming traffic across all running application Pods. |

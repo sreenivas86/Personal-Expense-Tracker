@@ -2,7 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: mysql-premium-sc
-  namespace: e-track-dev
+  
 provisioner: disk.csi.azure.com
 reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
