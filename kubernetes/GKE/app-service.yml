@@ -5,7 +5,7 @@ metadata:
   namespace: e-track-dev
 spec:
   selector:
-    app: e-track-app-svc
+    app: e-track-app
   type: LoadBalancer
   sessionAffinity: None
   sessionAffinityConfig:
