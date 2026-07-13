@@ -1,0 +1,27 @@
+name: Docker_pipeline
+on: 
+  workflow_run:
+    workflows:
+      - Build
+    types:
+      - completed
+
+jobs:
+  DockerBuild:
+    runs-on: ubuntu-latest
+    name: Build docker images and upload
+    env:
+      DOCKER_LATEST_IMAGE_NAME: ${{vars.DOCKERHUB_USERNAME}}/${{vars.IMAGE_NAME}}:latest
+      DOCKER_BUILD_IMAGE_NAME: ${{vars.DOCKERHUB_USERNAME}}/${{vars.IMAGE_NAME}}:ver_${{github.run_number}}
+    steps:
+      # clone the repository
+      - name: clone the repo
+        uses: actions/checkout@v4
+      # login dockerhub
+      - name: Dockerhub login
+        uses: docker/logi-action@v4
+        with:
+          Username: ${{vars.DOCKERHUB_USERNAME}}
+          Password: ${{secrets.DOCKERHUB_PASSWORD}}
+          
+      
